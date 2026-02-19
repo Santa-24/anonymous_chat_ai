@@ -1,1011 +1,307 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonymous Chat Platform - Create/Join Room</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366F1;
-            --primary-dark: #4F46E5;
-            --secondary: #8B5CF6;
-            --accent: #EC4899;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --danger: #EF4444;
-            --info: #3B82F6;
-            --bg-primary: #FAFBFC;
-            --bg-secondary: #F3F4F6;
-            --card-bg: #FFFFFF;
-            --text-primary: #1F2937;
-            --text-secondary: #6B7280;
-            --text-muted: #9CA3AF;
-            --border: #E5E7EB;
-            --shadow: rgba(0, 0, 0, 0.05);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-        }
-
-        body.dark-mode {
-            --bg-primary: #111827;
-            --bg-secondary: #1F2937;
-            --card-bg: #374151;
-            --text-primary: #F9FAFB;
-            --text-secondary: #D1D5DB;
-            --text-muted: #9CA3AF;
-            --border: #4B5563;
-            --shadow: rgba(0, 0, 0, 0.3);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            transition: all 0.3s ease;
-        }
-
-        /* Navigation */
-        .navbar {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-icon {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .logo-text {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-        }
-
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: none;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            transition: all 0.2s;
-        }
-
-        .icon-btn:hover {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.05);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius-md);
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #F97316);
-            color: white;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-        }
-
-        /* Hero Section */
-        .hero {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
-        }
-
-        .hero-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 3rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-subtitle {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto 3rem;
-            line-height: 1.6;
-        }
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
-            box-shadow: 0 4px 20px var(--shadow);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px var(--shadow);
-            border-color: var(--primary);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .icon-create {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-        }
-
-        .icon-join {
-            background: linear-gradient(135deg, var(--success), #34D399);
-        }
-
-        .card-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .card-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .input {
-            flex: 1;
-            padding: 0.875rem 1rem;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-md);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .input-room-id {
-            font-family: 'Space Grotesk', monospace;
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        .btn-small {
-            padding: 0.875rem;
-            border-radius: var(--radius-md);
-            background: var(--bg-secondary);
-            border: none;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-small:hover {
-            background: var(--border);
-        }
-
-        /* Checkbox */
-        .checkbox-group {
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-            align-items: center;
-        }
-
-        .checkbox-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-        }
-
-        .checkbox {
-            width: 18px;
-            height: 18px;
-            border-radius: 4px;
-            border: 2px solid var(--border);
-            background: var(--bg-secondary);
-            cursor: pointer;
-            appearance: none;
-            position: relative;
-        }
-
-        .checkbox:checked {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .checkbox:checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        /* Buttons */
-        .btn-full {
-            width: 100%;
-            padding: 1rem;
-            border-radius: var(--radius-lg);
-            font-size: 1rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-        }
-
-        .btn-create {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-create:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-join {
-            background: linear-gradient(135deg, var(--success), #34D399);
-            color: white;
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-join:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
-        }
-
-        /* Divider */
-        .divider {
-            text-align: center;
-            margin: 1.5rem 0;
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .divider-text {
-            background: var(--card-bg);
-            padding: 0 1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Info Box */
-        .info-box {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: var(--radius-lg);
-            padding: 1rem;
-            margin-top: 1rem;
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .info-icon {
-            color: var(--warning);
-            font-size: 1.125rem;
-            flex-shrink: 0;
-            margin-top: 0.125rem;
-        }
-
-        .info-text {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        /* Features Grid */
-        .features {
-            max-width: 1000px;
-            margin: 4rem auto 0;
-            padding: 0 2rem;
-        }
-
-        .section-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--text-primary);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .feature-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-            transition: all 0.2s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 25px var(--shadow);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: white;
-            margin-bottom: 1rem;
-        }
-
-        .feature-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .feature-description {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            margin-top: 4rem;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        .footer-text {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal {
-            background: var(--card-bg);
-            border-radius: var(--radius-xl);
-            padding: 2.5rem;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-            background: linear-gradient(135deg, var(--success), #34D399);
-        }
-
-        .modal-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .modal-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .modal-input-group {
-            margin-bottom: 1rem;
-        }
-
-        .modal-input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-md);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .modal-input-readonly {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: var(--primary);
-            color: var(--primary);
-            font-family: 'Space Grotesk', monospace;
-            font-size: 1.25rem;
-            font-weight: 700;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .btn-copy {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            flex: 1;
-        }
-
-        .btn-copy:hover {
-            transform: translateY(-1px);
-        }
-
-        .btn-close {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-close:hover {
-            background: var(--border);
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .loading-spinner {
-            width: 64px;
-            height: 64px;
-            border: 3px solid rgba(99, 102, 241, 0.3);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero {
-                padding: 2rem 1rem;
-            }
-
-            .hero-title {
-                font-size: 2.25rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1.125rem;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .card {
-                padding: 1.5rem;
-            }
-
-            .navbar {
-                padding: 1rem;
-            }
-
-            .logo-text {
-                display: none;
-            }
-        }
-
-        .hidden {
-            display: none !important;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnonChat — Anonymous Real-Time Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --card: #16161f;
+  --border: #1e1e2d;
+  --border-hover: #2a2a3d;
+  --text: #e2e2f0;
+  --text-muted: #6b6b8a;
+  --text-dim: #3d3d55;
+  --accent: #7c6ff7;
+  --accent2: #a78bfa;
+  --accent-glow: rgba(124, 111, 247, 0.15);
+  --green: #34d399;
+  --red: #f87171;
+  --yellow: #fbbf24;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+[data-theme="light"] {
+  --bg: #f5f5fb;
+  --surface: #ffffff;
+  --card: #f0f0fa;
+  --border: #ddddf0;
+  --border-hover: #c0c0e0;
+  --text: #1a1a2e;
+  --text-muted: #5a5a7a;
+  --text-dim: #b0b0c8;
+  --accent-glow: rgba(124,111,247,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Background grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(124,111,247,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,111,247,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* Glow orbs */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  animation: float 8s ease-in-out infinite;
+}
+.orb-1 { width: 400px; height: 400px; background: rgba(124,111,247,0.08); top: -100px; right: -100px; }
+.orb-2 { width: 300px; height: 300px; background: rgba(52,211,153,0.06); bottom: 0; left: -50px; animation-delay: -4s; }
+
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+
+/* Nav */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  background: rgba(10,10,15,0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="light"] nav { background: rgba(245,245,251,0.8); }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+.logo-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 0 var(--accent)} 50%{box-shadow:0 0 0 6px transparent} }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-badge { font-size: 12px; padding: 4px 12px; border-radius: 100px; background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent); font-family: 'DM Mono', monospace; }
+.icon-btn { background: none; border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; cursor: pointer; font-size: 16px; display: grid; place-items: center; transition: all 0.2s; }
+.icon-btn:hover { border-color: var(--accent); background: var(--accent-glow); }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 100px 24px 60px;
+  text-align: center;
+}
+.hero-content { max-width: 680px; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-family: 'DM Mono', monospace;
+  padding: 6px 16px; border-radius: 100px;
+  background: var(--accent-glow); color: var(--accent);
+  border: 1px solid rgba(124,111,247,0.3);
+  margin-bottom: 28px; letter-spacing: 0.05em;
+}
+.hero-tag span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+h1 {
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+.hero-accent {
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--green));
+  /* -webkit-background-clip: text; -webkit-text-fill-color: transparent; */
+  transition: opacity 0.3s;
+}
+.hero-sub { font-size: 18px; color: var(--text-muted); max-width: 480px; margin: 0 auto 40px; line-height: 1.7; }
+
+/* Card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  max-width: 460px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 0 60px rgba(124,111,247,0.05);
+}
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 28px; background: var(--surface); padding: 4px; border-radius: 12px; }
+.tab {
+  flex: 1; padding: 10px; border: none; background: none;
+  color: var(--text-muted); font-family: inherit; font-size: 14px; font-weight: 500;
+  border-radius: 9px; cursor: pointer; transition: all 0.2s;
+}
+.tab.active { background: var(--accent); color: #fff; }
+
+/* Form */
+.form-group { display: flex; flex-direction: column; gap: 20px; }
+.field { display: flex; flex-direction: column; gap: 8px; }
+label { font-size: 13px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+input {
+  padding: 13px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  transition: all 0.2s;
+  outline: none;
+}
+input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+input::placeholder { color: var(--text-dim); }
+
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--border); }
+.toggle-label { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.toggle-label small { color: var(--text-muted); font-size: 12px; }
+.toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; inset: 0; background: var(--border); border-radius: 100px; cursor: pointer; transition: 0.3s; }
+.slider:before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+input:checked + .slider { background: var(--accent); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+.btn {
+  padding: 14px 24px; border: none; border-radius: 12px;
+  font-family: inherit; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); box-shadow: 0 8px 32px rgba(124,111,247,0.3); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Features */
+.features {
+  padding: 60px 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.feature-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  transition: all 0.3s;
+}
+.feature-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+.feat-icon { font-size: 28px; margin-bottom: 12px; }
+.feat-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.feat-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+/* Footer */
+footer {
+  text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+footer a { color: var(--accent); text-decoration: none; }
+
+/* Toast animations */
+@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+/* Responsive */
+@media (max-width: 600px) {
+  nav { padding: 12px 16px; }
+  .card { padding: 24px 20px; }
+  h1 { font-size: 40px; }
+}
+</style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="logo">
-            <div class="logo-icon">
-                <i class="fas fa-comments"></i>
-            </div>
-            <span class="logo-text">AnonymousChat</span>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<nav>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    AnonChat
+  </div>
+  <div class="nav-right">
+    <span class="nav-badge" id="stat-server">● Online</span>
+    <button class="icon-btn" id="theme-toggle" title="Toggle theme">☀️</button>
+    <a href="admin.html" style="text-decoration:none">
+      <button class="icon-btn" title="Admin">⚙️</button>
+    </a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag"><span></span> No Registration · No History · No Trace</div>
+    <h1>Chat <span class="hero-accent" id="hero-accent">Anonymous.</span></h1>
+    <p class="hero-sub">Create a private room in seconds. Share the 6-digit code. Talk in real-time — no accounts, no tracking, no bullshit.</p>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab active" id="tab-create">✨ Create Room</button>
+        <button class="tab" id="tab-join">🚪 Join Room</button>
+      </div>
+
+      <!-- Create Form -->
+      <div id="create-form" class="form-group">
+        <div class="field">
+          <label>Your Nickname</label>
+          <input type="text" id="nickname" placeholder="e.g. CryptoFox" maxlength="20" autocomplete="off">
         </div>
-        <div class="nav-actions">
-            <button class="icon-btn" id="themeToggle" title="Toggle Theme">
-                <i class="fas fa-moon"></i>
-            </button>
-            <a href="admin.html" class="btn btn-danger">
-                <i class="fas fa-shield-alt"></i>
-                Admin
-            </a>
+        <div class="field">
+          <label>Admin Password <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+          <input type="password" id="admin-password" placeholder="Set a password for your room" maxlength="50">
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <main class="hero">
-        <h1 class="hero-title">Private, Anonymous & Secure</h1>
-        <p class="hero-subtitle">
-            Create a temporary chat room, invite friends, and chat anonymously. No sign-up required.
-        </p>
-
-        <!-- Cards Grid -->
-        <div class="cards-grid">
-            <!-- Create Room Card -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon icon-create">
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div>
-                        <h2 class="card-title">Create New Room</h2>
-                        <p class="card-subtitle">Start a fresh conversation</p>
-                    </div>
-                </div>
-
-                <form id="createRoomForm">
-                    <div class="form-group">
-                        <label class="form-label">Your Display Name</label>
-                        <div class="input-group">
-                            <input 
-                                type="text" 
-                                class="input" 
-                                id="createUsername"
-                                placeholder="e.g., swift_fox_321"
-                                maxlength="30"
-                                required
-                            >
-                            <button type="button" class="btn-small" onclick="generateUsername('createUsername')">
-                                <i class="fas fa-random"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Room Settings</label>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="enableAI" class="checkbox">
-                            <label for="enableAI" class="checkbox-label">Enable AI Assistant in room</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="roomLock" class="checkbox">
-                            <label for="roomLock" class="checkbox-label">Lock room after creation</label>
-                        </div>
-                    </div>
-
-                    <div class="info-box">
-                        <div class="info-icon">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <p class="info-text">
-                            Room creator becomes temporary admin with control over that room only.
-                        </p>
-                    </div>
-
-                    <button type="button" class="btn-full btn-create" onclick="createRoom()">
-                        <i class="fas fa-rocket"></i>
-                        Create Room & Get Admin Access
-                    </button>
-                </form>
-            </div>
-
-            <!-- Join Room Card -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon icon-join">
-                        <i class="fas fa-sign-in-alt"></i>
-                    </div>
-                    <div>
-                        <h2 class="card-title">Join Existing Room</h2>
-                        <p class="card-subtitle">Enter a room ID or use invite link</p>
-                    </div>
-                </div>
-
-                <form id="joinRoomForm">
-                    <div class="form-group">
-                        <label class="form-label">Your Display Name</label>
-                        <div class="input-group">
-                            <input 
-                                type="text" 
-                                class="input" 
-                                id="joinUsername"
-                                placeholder="e.g., calm_panda_456"
-                                maxlength="30"
-                                required
-                            >
-                            <button type="button" class="btn-small" onclick="generateUsername('joinUsername')">
-                                <i class="fas fa-random"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Room ID</label>
-                        <input 
-                            type="text" 
-                            class="input input-room-id" 
-                            id="roomId"
-                            placeholder="e.g., ABC123"
-                            maxlength="6"
-                            required
-                        >
-                        <p class="card-subtitle" style="margin-top: 0.5rem;">
-                            Ask your friend for the 6-character Room ID
-                        </p>
-                    </div>
-
-                    <div class="divider">
-                        <span class="divider-text">OR</span>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Invite Link</label>
-                        <div class="input-group">
-                            <input 
-                                type="text" 
-                                class="input" 
-                                id="inviteLink"
-                                placeholder="Paste invite link here"
-                            >
-                            <button type="button" class="btn-small" onclick="extractRoomId()">
-                                <i class="fas fa-link"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn-full btn-join" onclick="joinRoom()">
-                        <i class="fas fa-door-open"></i>
-                        Join Room Anonymously
-                    </button>
-                </form>
-            </div>
+        <div class="toggle-row">
+          <div class="toggle-label">🤖 AI Assistant <small>(use @ai to invoke)</small></div>
+          <label class="toggle"><input type="checkbox" id="toggle-ai"><span class="slider"></span></label>
         </div>
+        <button class="btn btn-primary" id="create-btn">Create Room →</button>
+      </div>
 
-        <!-- Features Section -->
-        <section class="features">
-            <h2 class="section-title">How It Works</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon" style="background: linear-gradient(135deg, #3B82F6, #60A5FA);">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
-                    <h3 class="feature-title">Temporary Admin</h3>
-                    <p class="feature-description">
-                        Room creator becomes temporary admin with powers to delete messages, clear chat, and manage users in that room only.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h3 class="feature-title">AI Assistant</h3>
-                    <p class="feature-description">
-                        Optional AI chat assistant in each room. Room admin can toggle AI on/off. Ask questions and get instant replies.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon" style="background: linear-gradient(135deg, #EF4444, #F87171);">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3 class="feature-title">Global Admin</h3>
-                    <p class="feature-description">
-                        System-wide admin with full control. Can delete any room, manage all users, and enable maintenance mode for entire platform.
-                    </p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p class="footer-text">
-            <i class="fas fa-lock"></i>
-            All chats are anonymous. No personal data is stored permanently.
-        </p>
-        <p>Rooms auto-expire after 24 hours of inactivity.</p>
-    </footer>
-
-    <!-- Loading Modal -->
-    <div class="loading-overlay" id="loadingModal">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Creating Room...</p>
+      <!-- Join Form -->
+      <div id="join-form" class="form-group" style="display:none">
+        <div class="field">
+          <label>Room ID</label>
+          <input type="text" id="join-room-id" placeholder="6-digit code" maxlength="6" inputmode="numeric" autocomplete="off">
         </div>
+        <div class="field">
+          <label>Your Nickname</label>
+          <input type="text" id="join-nickname" placeholder="e.g. SilentWolf" maxlength="20" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Admin Password <span style="font-weight:400;color:var(--text-muted)">(if you're an admin)</span></label>
+          <input type="password" id="join-admin-password" placeholder="Optional — for admin privileges" maxlength="50">
+        </div>
+        <button class="btn btn-primary" id="join-btn">Join Room →</button>
+      </div>
     </div>
+  </div>
+</section>
 
-    <!-- Room Created Modal -->
-    <div class="modal-overlay" id="roomCreatedModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div>
-                    <h2 class="modal-title">Room Created Successfully!</h2>
-                    <p class="modal-subtitle">You are now the temporary admin of this room</p>
-                </div>
-            </div>
+<section class="features">
+  <div class="feature-card"><div class="feat-icon">🔒</div><div class="feat-title">Truly Anonymous</div><div class="feat-desc">No accounts, no emails, no identity — just a nickname.</div></div>
+  <div class="feature-card"><div class="feat-icon">⚡</div><div class="feat-title">Real-Time</div><div class="feat-desc">Instant messaging with typing indicators via WebSocket.</div></div>
+  <div class="feature-card"><div class="feat-icon">🤖</div><div class="feat-title">AI Integration</div><div class="feat-desc">Invoke an AI assistant in any room with @ai.</div></div>
+  <div class="feature-card"><div class="feat-icon">👑</div><div class="feat-title">Room Controls</div><div class="feat-desc">Lock rooms, kick users, clear chat — full admin tools.</div></div>
+  <div class="feature-card"><div class="feat-icon">🌐</div><div class="feat-title">Auto Reconnect</div><div class="feat-desc">Drops happen. We reconnect automatically.</div></div>
+  <div class="feature-card"><div class="feat-icon">🎨</div><div class="feat-title">Dark & Light</div><div class="feat-desc">Your eyes, your rules. Toggle themes anytime.</div></div>
+</section>
 
-            <div class="modal-input-group">
-                <label class="form-label">Room ID (Share with friends)</label>
-                <div class="input-group">
-                    <input 
-                        type="text" 
-                        class="modal-input modal-input-readonly" 
-                        id="createdRoomId"
-                        readonly
-                    >
-                    <button class="btn btn-small btn-copy" onclick="copyRoomId()">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                </div>
-            </div>
+<footer>
+  Built by <a href="#">Santanu Barik</a> · BCA · Web Developer · Cloud & Backend Enthusiast
+</footer>
 
-            <div class="modal-input-group">
-                <label class="form-label">Invite Link</label>
-                <div class="input-group">
-                    <input 
-                        type="text" 
-                        class="modal-input" 
-                        id="inviteLinkDisplay"
-                        readonly
-                    >
-                    <button class="btn btn-small btn-copy" onclick="copyInviteLink()">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="info-box" style="background: rgba(245, 158, 11, 0.1);">
-                <div class="info-icon">
-                    <i class="fas fa-key"></i>
-                </div>
-                <div>
-                    <p class="info-text" style="font-weight: 600; color: var(--warning);">
-                        Admin Access Token
-                    </p>
-                    <p class="info-text" style="margin-top: 0.25rem;">
-                        Save this token to maintain admin access if you refresh the page:
-                    </p>
-                    <p class="info-text" id="adminTokenDisplay" style="font-family: monospace; font-size: 0.6875rem; margin-top: 0.5rem;">
-                        Loading...
-                    </p>
-                </div>
-            </div>
-
-            <div class="modal-buttons">
-                <button class="btn btn-copy" onclick="enterCreatedRoom()">
-                    <i class="fas fa-arrow-right"></i>
-                    Enter Room as Admin
-                </button>
-                <button class="btn btn-close" onclick="closeRoomModal()">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="./js/home.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/home.js"></script>
 </body>
 </html>

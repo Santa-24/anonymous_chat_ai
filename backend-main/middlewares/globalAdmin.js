@@ -1,36 +1,11 @@
-import jwt from 'jsonwebtoken';
+const GLOBAL_ADMIN_PASSWORD = process.env.GLOBAL_ADMIN_PASSWORD || 'admin123';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'anonymous-chat-secret-key-change-in-production';
-
-export function verifyGlobalAdmin(req, res, next) {
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ error: 'No token provided' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        
-        if (!decoded.isGlobalAdmin) {
-            return res.status(403).json({ error: 'Not authorized as global admin' });
-        }
-
-        req.admin = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: 'Invalid token' });
-    }
+function globalAdminAuth(req, res, next) {
+  const password = req.headers['x-admin-password'] || req.body?.password || req.query?.password;
+  if (!password || password !== GLOBAL_ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid admin password.' });
+  }
+  next();
 }
 
-export function isGlobalAdminForSocket(socket) {
-    try {
-        const token = socket.handshake.auth.token;
-        if (!token) return false;
-
-        const decoded = jwt.verify(token, JWT_SECRET);
-        return decoded.isGlobalAdmin === true;
-    } catch (error) {
-        return false;
-    }
-}
+module.exports = { globalAdminAuth };

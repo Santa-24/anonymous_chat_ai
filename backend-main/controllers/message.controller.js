@@ -1,51 +1,35 @@
-export class MessageController {
-    constructor(messages) {
-        this.messages = messages;
-    }
-
-    // Get messages for a room
-    getMessages(req, res) {
-        try {
-            const { roomId } = req.params;
-            const roomMessages = this.messages.get(roomId) || [];
-
-            // Limit to last 100 messages
-            const limitedMessages = roomMessages.slice(-100);
-
-            res.json(limitedMessages);
-        } catch (error) {
-            console.error('Error getting messages:', error);
-            res.status(500).json({ error: 'Failed to get messages' });
-        }
-    }
-
-    // Delete a message (room admin only)
-    deleteMessage(req, res) {
-        try {
-            const { roomId, messageId } = req.params;
-            const { adminToken } = req.query;
-
-            if (!adminToken) {
-                return res.status(401).json({ error: 'Admin token required' });
-            }
-
-            const roomMessages = this.messages.get(roomId);
-            if (!roomMessages) {
-                return res.status(404).json({ error: 'Room not found' });
-            }
-
-            const messageIndex = roomMessages.findIndex(m => m.id === messageId);
-            if (messageIndex === -1) {
-                return res.status(404).json({ error: 'Message not found' });
-            }
-
-            // Remove message
-            roomMessages.splice(messageIndex, 1);
-
-            res.json({ success: true });
-        } catch (error) {
-            console.error('Error deleting message:', error);
-            res.status(500).json({ error: 'Failed to delete message' });
-        }
-    }
+function getRoomMessages(req, res) {
+  const { roomId } = req.params;
+  const rooms = global.rooms;
+  const room = rooms?.get(roomId);
+  if (!room) return res.status(404).json({ error: 'Room not found.' });
+  const limit = parseInt(req.query.limit) || 100;
+  res.json({ messages: room.messages.slice(-limit), total: room.messages.length });
 }
+
+function deleteMessage(req, res) {
+  const { roomId, messageId } = req.params;
+  const rooms = global.rooms;
+  const io = global.io;
+  const room = rooms?.get(roomId);
+  if (!room) return res.status(404).json({ error: 'Room not found.' });
+
+  const idx = room.messages.findIndex(m => m.id === messageId);
+  if (idx === -1) return res.status(404).json({ error: 'Message not found.' });
+  room.messages.splice(idx, 1);
+  io.to(roomId).emit('message_deleted', { messageId });
+  res.json({ success: true });
+}
+
+function clearRoomMessages(req, res) {
+  const { roomId } = req.params;
+  const rooms = global.rooms;
+  const io = global.io;
+  const room = rooms?.get(roomId);
+  if (!room) return res.status(404).json({ error: 'Room not found.' });
+  room.messages = [];
+  io.to(roomId).emit('chat_cleared');
+  res.json({ success: true, message: 'Chat cleared.' });
+}
+
+module.exports = { getRoomMessages, deleteMessage, clearRoomMessages };

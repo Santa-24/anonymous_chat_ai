@@ -1,37 +1,16 @@
-import jwt from 'jsonwebtoken';
+function roomAdminAuth(req, res, next) {
+  const { roomId } = req.params;
+  const rooms = global.rooms;
+  if (!rooms) return res.status(500).json({ error: 'Server not initialized.' });
+  const room = rooms.get(roomId);
+  if (!room) return res.status(404).json({ error: 'Room not found.' });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'anonymous-chat-secret-key-change-in-production';
-
-export function verifyRoomAdmin(req, res, next) {
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ error: 'No token provided' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        
-        const { roomId } = req.params;
-        if (decoded.roomId !== roomId || !decoded.isRoomAdmin) {
-            return res.status(403).json({ error: 'Not authorized as room admin' });
-        }
-
-        req.roomAdmin = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: 'Invalid token' });
-    }
+  const providedPassword = req.headers['x-room-password'] || req.body?.adminPassword;
+  if (!providedPassword || providedPassword !== room.adminPassword) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid room admin password.' });
+  }
+  req.room = room;
+  next();
 }
 
-export function isRoomAdminForSocket(socket, roomId) {
-    try {
-        const token = socket.handshake.auth.token;
-        if (!token) return false;
-
-        const decoded = jwt.verify(token, JWT_SECRET);
-        return decoded.roomId === roomId && decoded.isRoomAdmin === true;
-    } catch (error) {
-        return false;
-    }
-}
+module.exports = { roomAdminAuth };

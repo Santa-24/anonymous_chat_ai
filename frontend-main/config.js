@@ -1,11 +1,11 @@
-(function () {
-const hostname = window.location.hostname;
-let backendUrl;
-if (hostname === "localhost" || hostname === "127.0.0.1") {
-backendUrl = "http://localhost:5000"; // local dev
-} else {
-backendUrl = "https://chic-reprieve-production.up.railway.app"; // your Railway backend URL
-}
-window.BACKEND_URL = backendUrl;
-// window.ADMIN_KEY = "<removed>"; // ❌ remove this; don’t ship secrets to the client
-})();
+const CONFIG = {
+  BACKEND_URL: (() => {
+    if (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    ) {
+      return 'http://localhost:3000';
+    }
+    return window.location.origin;
+  })(),
+};

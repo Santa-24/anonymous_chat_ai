@@ -23,9 +23,6 @@ const CONFIG = {
     timeout: 20000,
   },
 
-  // ⚠️ For demo only — move to backend in future
-  GLOBAL_ADMIN_PASSWORD: 'admin123',
-
   MAX_MESSAGE_LENGTH: 2000,
   TYPING_TIMEOUT: 1500,
 };
